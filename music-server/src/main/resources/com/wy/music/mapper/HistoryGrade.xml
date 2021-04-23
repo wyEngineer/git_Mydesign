@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wy.music.dao.HistoryGradeMapper">
+
+    <insert id="addGrade" keyColumn="id" keyProperty="id" useGeneratedKeys="true" parameterType="HistoryGrade">
+        insert into history_grade (username,exaim_time,exaim_model,exaim_is_qualified,exaimScore)
+        values
+        (#{username},#{exaimTime},#{exaimModel},#{exaimIsQualified},#{exaimScore})
+    </insert>
+
+    <!--查询历史成绩-->
+    <resultMap id="GradeDataMap" type="HistoryGrade">
+        <id column="id" property="id"/>
+        <result column="username" property="username"/>
+        <result column="exaim_time" property="exaimTime"/>
+        <result column="exaim_model" property="exaimModel"/>
+        <result column="exaim_is_qualified" property="exaimIsQualified"/>
+        <result column="exaimScore" property="exaimScore"/>
+        <association property="admin" javaType="Admin">
+            <id column="id" property="id"/>
+            <result column="number" property="number"/>
+            <result column="name" property="name"/>
+        </association>
+    </resultMap>
+    <select id="selectGrade" resultMap="GradeDataMap">
+        select * from history_grade h
+        left join t_user t
+        on h.username = t.username
+        where h.exaim_model = #{model} and h.username = #{username}
+        <if test='selectCondition !=null and selectCondition != "" '>
+            and h.exaim_time like concat('%',#{selectCondition},'%')
+        </if>
+        order by h.id desc
+        limit #{page},#{size}
+    </select>
+
+
+    <!--查询总记录数-->
+    <select id="findByTotal" resultType="Long">
+        select count(id) from history_grade where username =#{username} and exaim_model =#{model}
+        <if test='selectCondition !=null and selectCondition != "" '>
+            and exaim_time like concat ('%',#{selectCondition},'%')
+        </if>
+    </select>
+
+    <!--删除历史成绩-->
+    <delete id="deleteHistory" parameterType="integer">
+        delete from history_grade where id =#{id}
+    </delete>
+</mapper>

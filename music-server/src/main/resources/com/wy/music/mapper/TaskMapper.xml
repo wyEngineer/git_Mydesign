@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wy.music.dao.TaskMapper">
+
+    <!--添加任务-->
+    <insert id="addTask" parameterType="Task" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        insert into task (username,task_create,task_describe) values
+        (#{username},#{taskCreate},#{taskDescribe})
+    </insert>
+    <!--查询任务-->
+    <resultMap id="TaskDataMap" type="Task">
+        <id column="id" property="id"/>
+        <result column="username" property="username"/>
+        <result column="task_create" property="taskCreate"/>
+        <result column="task_status" property="taskStatus"/>
+        <result column="task_describe" property="taskDescribe"/>
+    </resultMap>
+    <select id="selectAll"  resultMap="TaskDataMap">
+        select id,username,task_create,task_status,task_describe from task
+        where username =#{username} order by id desc
+        limit #{start},#{size}
+    </select>
+    <!--查询任务总记录条数-->
+    <select id="findTotal" parameterType="string" resultType="Long">
+        select count(id) from task where username =#{username}
+    </select>
+
+    <!--修改任务状态-->
+    <update id="updateFlag" parameterType="integer">
+        update task set task_status =#{taskStatus} where id =#{id}
+    </update>
+    
+    <!--删除任务-->
+    <delete id="deleteTask" parameterType="integer">
+        delete from task where id =#{id}
+    </delete>
+</mapper>

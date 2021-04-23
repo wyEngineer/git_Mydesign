@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wy.music.dao.ExaminationTestMapper">
+    <!--查询所有单选题==测试-->
+    <resultMap id="BaseMapTest" type="Examination">
+        <id column="id" property="id"/>
+        <result column="s_text" property="subjectText"/>
+        <result column="s_answer_text" property="subjectAnswerText"/>
+        <result column="s_answer_choose" property="subjectAnswerChoose"/>
+        <!--子查询对应题目的四个答案-->
+        <association property="aloneAnswer" select="sonAnswersTest" column="id"></association>
+    </resultMap>
+    <!-- #{start},#{limit}-->
+    <select id="selectAloneProblemTest" resultMap="BaseMapTest">
+        select id,s_text,s_answer_text,s_answer_choose from subject limit #{start},#{pageSize}
+    </select>
+    <!--子查询拿到对应的四个答案选项-->
+    <resultMap id="fourAnswersMapTest" type="AloneAnswer">
+        <id column="id" property="id"/>
+        <result column="subject_id" property="subjectId"/>
+        <result column="text_A" property="textA"/>
+        <result column="text_B" property="textB"/>
+        <result column="text_C" property="textC"/>
+        <result column="text_D" property="textD"/>
+    </resultMap>
+    <select id="sonAnswersTest" parameterType="Integer" resultMap="fourAnswersMapTest">
+        select  id,subject_id,text_A,text_B,text_C,text_D from alone_choose where subject_id=#{id}
+    </select>
+
+    <!--考试-->
+    <resultMap id="BaseMap" type="Examination">
+        <id column="id" property="id"/>
+        <result column="s_text" property="subjectText"/>
+        <result column="s_answer_text" property="subjectAnswerText"/>
+        <result column="s_answer_choose" property="subjectAnswerChoose"/>
+        <!--子查询对应题目的四个答案-->
+        <association property="aloneAnswer" select="sonAnswers" column="id"></association>
+    </resultMap>
+    <!-- #{start},#{limit}-->
+    <select id="selectAloneProblem" resultMap="BaseMap">
+        select id,s_text,s_answer_text,s_answer_choose from subject
+    </select>
+
+    <!--子查询拿到对应的四个答案选项-->
+    <resultMap id="fourAnswersMap" type="AloneAnswer">
+        <id column="id" property="id"/>
+        <result column="subject_id" property="subjectId"/>
+        <result column="text_A" property="textA"/>
+        <result column="text_B" property="textB"/>
+        <result column="text_C" property="textC"/>
+        <result column="text_D" property="textD"/>
+    </resultMap>
+    <select id="sonAnswers" parameterType="Integer" resultMap="fourAnswersMap">
+        select  id,subject_id,text_A,text_B,text_C,text_D from alone_choose where subject_id=#{id}
+    </select>
+
+    <!--查询总记录条数-->
+    <select id="findPageTotal" resultType="Long">
+            select count(id) from  subject
+    </select>
+
+    <!--单选练习内的问题提交-->
+    <insert id="addAloneDescribe" parameterType="AloneDescribe" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        insert into problem_describe
+        (t_username,problem_id,telephone,alone_describe,problem_model)
+        values
+        (#{username},#{problemId},#{telephone},#{describe},#{problemModel})
+    </insert>
+</mapper>

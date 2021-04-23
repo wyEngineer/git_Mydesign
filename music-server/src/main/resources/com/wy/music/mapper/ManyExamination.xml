@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--多选的mapper.xml-->
+<mapper namespace="com.wy.music.dao.ManyExaminationMapper">
+
+    <!--查询所有多选题-->
+    <resultMap id="ManyBaseDataMap" type="ManyExamination">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="ms_text" property="ManyText" jdbcType="VARCHAR"/>
+        <result column="ms_answer_choose" property="ManyAnswerChoose" jdbcType="VARCHAR"/>
+        <!--相当于是把参数赋给查询语句-->
+        <association property="manyAnswer" select="selectAnswers" column="id"/>
+    </resultMap>
+    <select id="selectAll" resultMap="ManyBaseDataMap">
+        select id,ms_text,ms_answer_choose from many_subject
+        where 1 = 1
+        <if test='subjectText !=null and subjectText != "" '>
+            and ms_text like concat('%',#{subjectText},'%')
+        </if>
+        limit #{start},#{size}
+    </select>
+    <!--子查询拿到答案对象-->
+    <resultMap id="ManyAnswerDataMap" type="ManyAnswer">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="subject_id" property="subjectId" jdbcType="INTEGER"/>
+        <result column="text_A" property="textA" jdbcType="VARCHAR"/>
+        <result column="text_B" property="textB" jdbcType="VARCHAR"/>
+        <result column="text_C" property="textC" jdbcType="VARCHAR"/>
+        <result column="text_D" property="textD" jdbcType="VARCHAR"/>
+        <result column="text_E" property="textE" jdbcType="VARCHAR"/>
+    </resultMap>
+    <select id="selectAnswers" parameterType="Integer" resultMap="ManyAnswerDataMap">
+         select id,subject_id,text_A,text_B,text_C,text_D,text_E from many_choose where subject_id =#{id}
+    </select>
+
+    <!--查询总记录条数-->
+    <select id="findPageTotal" resultType="Long">
+        select count(id) from many_subject where 1 = 1
+        <if test='subjectText !=null and subjectText != "" '>
+            and ms_text like concat('%',#{subjectText},'%')
+        </if>
+    </select>
+
+
+
+
+    <!--查询所有多选题-->
+    <resultMap id="ManyBaseDataMapTest" type="ManyExamination">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="ms_text" property="ManyText" jdbcType="VARCHAR"/>
+        <result column="ms_answer_choose" property="ManyAnswerChoose" jdbcType="VARCHAR"/>
+        <!--相当于是把参数赋给查询语句-->
+        <association property="manyAnswer" select="selectAnswersTest" column="id"/>
+    </resultMap>
+    <select id="selectAllTest" resultMap="ManyBaseDataMapTest">
+        select id,ms_text,ms_answer_choose from many_subject
+    </select>
+    <!--子查询拿到答案对象-->
+    <resultMap id="ManyAnswerDataMapTest" type="ManyAnswer">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="subject_id" property="subjectId" jdbcType="INTEGER"/>
+        <result column="text_A" property="textA" jdbcType="VARCHAR"/>
+        <result column="text_B" property="textB" jdbcType="VARCHAR"/>
+        <result column="text_C" property="textC" jdbcType="VARCHAR"/>
+        <result column="text_D" property="textD" jdbcType="VARCHAR"/>
+        <result column="text_E" property="textE" jdbcType="VARCHAR"/>
+    </resultMap>
+    <select id="selectAnswersTest"  resultMap="ManyAnswerDataMapTest">
+         select id,subject_id,text_A,text_B,text_C,text_D,text_E from many_choose where subject_id =#{id}
+    </select>
+
+
+</mapper>

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC
+        "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wy.music.dao.AdminMapper">
+    <resultMap id="BaseResultMap" type="Admin">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="username" jdbcType="VARCHAR" property="username"/>
+        <result column="password" jdbcType="VARCHAR" property="password"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="number" jdbcType="VARCHAR" property="number"/>
+        <!--查询角色信息-->
+        <association property="role" column="id" javaType="Role">
+            <id column="id" property="id"/>
+            <result column="role_name" property="roleName"/>
+        </association>
+        <!--查询头像-->
+        <association property="image" column="id" javaType="Image">
+            <result column="imageUrl" property="imgUrl"/>
+        </association>
+    </resultMap>
+    <select id="selectUserInfo" parameterType="string" resultMap="BaseResultMap">
+        select t.id ,number,username,name,password,r.role_name,imageUrl from t_user t
+         left join  user_role ur
+         on t.id=ur.user_id
+         left join role r
+         on ur.role_id = r.id
+         left join image i
+         on t.username = i.imageName
+         where username=#{username}
+    </select>
+
+
+    <select id="verifyPassword" resultType="java.lang.Integer">
+        select count(*) from t_user where username=#{username} and password=#{password}
+    </select>
+
+    <update id="updateUserPassword" parameterType="string">
+        update t_user set password = #{password} where username =#{username};
+    </update>
+
+    <!--查看用户流量-->
+    <resultMap id="VisitData" type="Visits">
+        <id column="id" property="id"/>
+        <result column="visit_number" property="visitNumber"/>
+        <result column="fabulous_number" property="fabulousNumber"/>
+    </resultMap>
+    <select id="selectVisits" resultMap="VisitData">
+        select id,visit_number,fabulous_number from visits
+    </select>
+
+    <!--查看用户点赞量-->
+
+    <!--修改点击量-->
+    <update id="updateVisits" parameterType="integer">
+        update visits set visit_number = visit_number +1 where id =#{id}
+    </update>
+
+    <!--修改用户点赞量-->
+    <update id="addFabulous" parameterType="Integer">
+        update visits set fabulous_number = fabulous_number +1 where id = #{id}
+    </update>
+</mapper>
